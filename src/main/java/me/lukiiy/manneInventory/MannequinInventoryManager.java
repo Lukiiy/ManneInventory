@@ -1,4 +1,4 @@
-package me.lukiiy.manneventories;
+package me.lukiiy.manneInventory;
 
 import me.lukiiy.barrel.Barrel;
 import org.bukkit.Bukkit;
