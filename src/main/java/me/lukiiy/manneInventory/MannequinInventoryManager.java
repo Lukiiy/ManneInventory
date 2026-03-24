@@ -64,6 +64,7 @@ public class MannequinInventoryManager {
         }
 
         String data = Barrel.serializeArray(inventory.getContents());
+
         if (data != null) mannequin.getPersistentDataContainer().set(KEY, PersistentDataType.STRING, data);
     }
 }
