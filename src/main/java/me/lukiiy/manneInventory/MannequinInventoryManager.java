@@ -8,12 +8,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MannequinInventoryManager {
     private static final NamespacedKey KEY = new NamespacedKey("manneinventory", "data");
-    private static final Map<Mannequin, Inventory> cache = new HashMap<>();
+    private static final Map<UUID, Inventory> cache = new ConcurrentHashMap<>();
 
     /**
      * Get a mannequin's inventory
@@ -21,6 +22,11 @@ public class MannequinInventoryManager {
      * @return An {@link Inventory}, or null if there isn't any
      */
     public static Inventory get(Mannequin mannequin) {
+        UUID uuid = mannequin.getUniqueId();
+
+        Inventory cached = cache.get(uuid);
+        if (cached != null) return cached;
+
         String data = mannequin.getPersistentDataContainer().get(KEY, PersistentDataType.STRING);
         if (data == null) return null;
 
@@ -28,6 +34,8 @@ public class MannequinInventoryManager {
         Inventory inventory = Bukkit.createInventory(null, items.length);
 
         inventory.setContents(items);
+        cache.put(uuid, inventory);
+
         return inventory;
     }
 
@@ -40,7 +48,7 @@ public class MannequinInventoryManager {
     public static Inventory create(Mannequin mannequin, int size) {
         Inventory inventory = Bukkit.createInventory(null, size);
 
-        set(mannequin, inventory);
+        cache.put(mannequin.getUniqueId(), inventory);
         return inventory;
     }
 
@@ -50,6 +58,7 @@ public class MannequinInventoryManager {
      */
     public static void clear(Mannequin mannequin) {
         mannequin.getPersistentDataContainer().remove(KEY);
+        cache.remove(mannequin.getUniqueId());
     }
 
     /**
@@ -64,7 +73,15 @@ public class MannequinInventoryManager {
         }
 
         String data = Barrel.serializeArray(inventory.getContents());
+        UUID uuid = mannequin.getUniqueId();
 
-        if (data != null) mannequin.getPersistentDataContainer().set(KEY, PersistentDataType.STRING, data);
+        if (data == null) {
+            mannequin.getPersistentDataContainer().remove(KEY);
+            cache.remove(uuid);
+            return;
+        }
+
+        mannequin.getPersistentDataContainer().set(KEY, PersistentDataType.STRING, data);
+        cache.put(uuid, inventory);
     }
 }
