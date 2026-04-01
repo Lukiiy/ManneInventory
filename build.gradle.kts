@@ -1,5 +1,6 @@
 plugins {
     java
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 group = "me.lukiiy"
@@ -13,6 +14,16 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.9-R0.1-SNAPSHOT")
     implementation(files("lib/Barrel-1.0-SNAPSHOT.jar"))
+}
+
+tasks {
+    shadowJar {
+        mergeServiceFiles()
+        archiveClassifier.set("")
+        minimize()
+    }
+
+    build { dependsOn(shadowJar) }
 }
 
 java {
