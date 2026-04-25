@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "me.lukiiy"
-version = "1.0-SNAPSHOT"
+version = "1.1"
 
 repositories {
     mavenCentral()
@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.9-R0.1-SNAPSHOT")
-    implementation(files("lib/Barrel-1.0-SNAPSHOT.jar"))
+    implementation(files("lib/Barrel-1.1.jar"))
 }
 
 tasks {
